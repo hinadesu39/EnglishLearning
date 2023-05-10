@@ -84,7 +84,7 @@ namespace ListeningAdmin.WebAPI.Albums
                 return NotFound("未找到该album");
             }
             album.Hide();
-            return Ok(album);
+            return Ok();
         }
         [HttpGet]
         [Route("{id}")]
@@ -96,7 +96,7 @@ namespace ListeningAdmin.WebAPI.Albums
                 return NotFound("未找到该album");
             }
             album.Show();
-            return Ok(album);
+            return Ok();
         }
         [HttpPut]
         [Route("{categoryId}")]

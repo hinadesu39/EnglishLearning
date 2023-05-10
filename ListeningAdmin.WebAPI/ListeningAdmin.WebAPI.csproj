@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="2.6.111" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
 	  <PackageReference Include="Serilog" Version="2.12.0" />
 	  <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
@@ -25,11 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CommonHelper\CommonHelper.csproj" />
     <ProjectReference Include="..\ListeningInfrastructure\ListeningInfrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Categories\Request\" />
-    <Folder Include="Episodes\Request\" />
   </ItemGroup>
 
 </Project>
