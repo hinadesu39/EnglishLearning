@@ -27,4 +27,9 @@
     <ProjectReference Include="..\ListeningInfrastructure\ListeningInfrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Categories\Request\" />
+    <Folder Include="Episodes\Request\" />
+  </ItemGroup>
+
 </Project>
