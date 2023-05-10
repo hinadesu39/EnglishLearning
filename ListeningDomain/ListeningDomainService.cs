@@ -20,7 +20,7 @@ namespace ListeningDomain
         {
             int maxSeq = await listeningRepository.GetMaxSeqOfCategoriesAsync();
             var id = Guid.NewGuid();
-            return Category.Create(id,maxSeq,name,coverUrl);   
+            return Category.Create(id,maxSeq + 1,name,coverUrl);   
         }
 
         public async Task SortCategory(Guid[] sortedCategoryIds)

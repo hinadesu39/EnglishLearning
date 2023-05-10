@@ -21,8 +21,8 @@ namespace ListeningAdmin.WebAPI
             {
                 return;
             }
-            //获取方法上的attribute，是否有UnitOfWorkAttribute
-            var uowAttr = actionDesc.MethodInfo.GetCustomAttribute<UnitOfWorkAttribute>();
+            //获取控制器上的attribute，是否有UnitOfWorkAttribute
+            var uowAttr = actionDesc.ControllerTypeInfo.GetCustomAttribute<UnitOfWorkAttribute>();
             if (uowAttr == null)
             {
                 return;

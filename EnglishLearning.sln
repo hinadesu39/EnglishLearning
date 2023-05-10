@@ -23,13 +23,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServiceInfrastructu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Listening", "Listening", "{144E4003-6C39-4CB8-8FEF-CE322E960B78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListeningDomain", "ListeningDomain\ListeningDomain.csproj", "{C43D6F73-089F-4BDF-9A33-A7CEB13B684E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ListeningDomain", "ListeningDomain\ListeningDomain.csproj", "{C43D6F73-089F-4BDF-9A33-A7CEB13B684E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListeningInfrastructure", "ListeningInfrastructure\ListeningInfrastructure.csproj", "{D66C6A1B-850E-4073-83BE-F7FAC7B5AB19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ListeningInfrastructure", "ListeningInfrastructure\ListeningInfrastructure.csproj", "{D66C6A1B-850E-4073-83BE-F7FAC7B5AB19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListeningAdmin.WebAPI", "ListeningAdmin.WebAPI\ListeningAdmin.WebAPI.csproj", "{00A5281E-F4A0-4B33-ACD7-BBF8729626B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ListeningAdmin.WebAPI", "ListeningAdmin.WebAPI\ListeningAdmin.WebAPI.csproj", "{00A5281E-F4A0-4B33-ACD7-BBF8729626B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListeningMain.WebAPI", "ListeningMain.WebAPI\ListeningMain.WebAPI.csproj", "{01049054-23FA-435B-8045-BCBA3E2FBB66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ListeningMain.WebAPI", "ListeningMain.WebAPI\ListeningMain.WebAPI.csproj", "{01049054-23FA-435B-8045-BCBA3E2FBB66}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MediaEncoder", "MediaEncoder", "{CFDBB4E3-790D-4311-B204-EB90742F40B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

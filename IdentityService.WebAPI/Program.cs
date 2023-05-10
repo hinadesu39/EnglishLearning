@@ -58,6 +58,8 @@ builder.Services.AddCors(options =>
 );
 //结束配置跨域
 
+
+
 //开始基础设施层注入
 builder.Services.AddScoped<IdDomainService>();
 builder.Services.AddScoped<IIdRepository, IdRepository>();

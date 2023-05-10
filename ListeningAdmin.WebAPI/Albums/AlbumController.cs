@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ListeningAdmin.WebAPI.Albums
 {
     [Route("api/[controller]/[action]")]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [ApiController]
     [UnitOfWork(typeof(ListeningDbContext))]
     public class AlbumController : ControllerBase
@@ -35,9 +35,9 @@ namespace ListeningAdmin.WebAPI.Albums
 
         [HttpGet]
         [Route("{categoryId}")]
-        public async Task<ActionResult<Album[]>> FindByCategoryId(Guid id)
+        public async Task<ActionResult<Album[]>> FindByCategoryId(Guid categoryId)
         {
-            return await repository.GetAlbumsByCategoryIdAsync(id);
+            return await repository.GetAlbumsByCategoryIdAsync(categoryId);
         }
 
         [HttpPost]
