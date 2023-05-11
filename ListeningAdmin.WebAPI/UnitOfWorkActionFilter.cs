@@ -1,14 +1,24 @@
-﻿using ListeningInfrastructure;
+﻿using CommonHelper;
+using ListeningInfrastructure;
+using MediatR;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace ListeningAdmin.WebAPI
 {
     public class UnitOfWorkFilter : IAsyncActionFilter
     {
+        private readonly IMediator mediator;
+        public UnitOfWorkFilter(IMediator mediator)
+        {
+            this.mediator = mediator;
+        }
+
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            
             var result = await next();
             if (result.Exception != null)
             {
@@ -33,9 +43,26 @@ namespace ListeningAdmin.WebAPI
                 var dbCtx = context.HttpContext.RequestServices.GetService(dbCtxType) as ListeningDbContext;
                 if (dbCtx != null)
                 {
+
+                    var domainEntities = dbCtx.ChangeTracker
+                    .Entries<IDomainEvents>()
+                    .Where(x => x.Entity.GetDomainEvents().Any());
+
+                    var domainEvents = domainEntities
+                        .SelectMany(x => x.Entity.GetDomainEvents())
+                        .ToList();//加ToList()是为立即加载，否则会延迟执行，到foreach的时候已经被ClearDomainEvents()了
+
+                    domainEntities.ToList()
+                        .ForEach(entity => entity.Entity.ClearDomainEvents());
+                    foreach (var domainEvent in domainEvents)
+                    {
+                        await mediator.Publish(domainEvent);
+                    }
+
                     await dbCtx.SaveChangesAsync();
                 }
             }
         }
+
     }
 }

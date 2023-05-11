@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ListeningDomain.Entities
 {
-    public class Episode
+    public class Episode: IDomainEvents
     {
         public Guid Id { get; protected set; } = Guid.NewGuid();
         private Episode() { }
@@ -136,7 +136,7 @@ namespace ListeningDomain.Entities
 
         public void AddDomainEvent(INotification eventItem)
         {
-            domainEvents.Add(eventItem);
+            domainEvents.Add(eventItem);           
         }
 
         public void AddDomainEventIfAbsent(INotification eventItem)
