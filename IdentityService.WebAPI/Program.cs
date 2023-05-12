@@ -2,13 +2,17 @@
 using IdentityServiceDomain;
 using IdentityServiceDomain.Entities;
 using IdentityServiceInfrastructure;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using StackExchange.Redis;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using Zack.Commons.JsonConverters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +22,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+    //设置时间格式。而非“2008-08-08T08:08:08”这样的格式
+    options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter("yyyy-MM-dd HH:mm:ss"));
+});
 
 ///数据库
 builder.Services.AddDbContext<IdDBContext>(ctx =>
@@ -57,8 +67,6 @@ builder.Services.AddCors(options =>
 }
 );
 //结束配置跨域
-
-
 
 //开始基础设施层注入
 builder.Services.AddScoped<IdDomainService>();
@@ -103,13 +111,27 @@ IdentityBuilder idBuilder = builder.Services.AddIdentityCore<User>(options =>
     options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
 }
 );
-idBuilder = new IdentityBuilder(idBuilder.UserType, typeof(Role), builder.Services);
+idBuilder = new IdentityBuilder(idBuilder.UserType, typeof(IdentityServiceDomain.Entities.Role), builder.Services);
 idBuilder.AddEntityFrameworkStores<IdDBContext>().AddDefaultTokenProviders()
     //.AddRoleValidator<RoleValidator<Role>>()
-    .AddRoleManager<RoleManager<Role>>()
+    .AddRoleManager<RoleManager<IdentityServiceDomain.Entities.Role>>()
     .AddUserManager<IdUserManager>();
 
 // Configure the HTTP request pipeline.
+
+
+//Redis的配置
+string redisConnStr = builder.Configuration.GetValue<string>("Redis:ConnStr");
+IConnectionMultiplexer redisConnMultiplexer = ConnectionMultiplexer.Connect(redisConnStr);
+builder.Services.AddSingleton(typeof(IConnectionMultiplexer), redisConnMultiplexer);
+
+
+
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.All;
+});
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -118,8 +140,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseForwardedHeaders();
@@ -128,5 +149,5 @@ app.MapControllers();
 //并在处理其他应用程序中间件（如 Razor Pages、Minimal APIs、MVC 等）之前将该文件夹中的任何内容作为静态内容提供¹。
 //这意味着，它可以让 ASP.NET Core 应用程序直接向客户端提供静态文件，例如 HTML、CSS、图像和 JavaScript²。
 app.UseStaticFiles();
-app.UseCors();
+
 app.Run();

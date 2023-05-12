@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ListeningAdmin.WebAPI.Categories
 {
     [Route("[controller]/[action]")]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [UnitOfWork(typeof(ListeningDbContext))]
     public class CategoryController : ControllerBase

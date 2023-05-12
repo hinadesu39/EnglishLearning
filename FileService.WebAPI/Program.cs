@@ -11,6 +11,7 @@ using UserMgrWebApi;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Builder;
 using Serilog;
+using Zack.Commons.JsonConverters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,11 @@ var builder = WebApplication.CreateBuilder(args);
 IServiceCollection services = builder.Services;
 IConfiguration configuration = builder.Configuration;
 // Add services to the container.
-
+services.Configure<JsonOptions>(options =>
+{
+    //设置时间格式。而非“2008-08-08T08:08:08”这样的格式
+    options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter("yyyy-MM-dd HH:mm:ss"));
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -112,7 +117,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+
 
 app.UseAuthentication();
 app.UseAuthorization();

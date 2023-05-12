@@ -9,8 +9,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ListeningAdmin.WebAPI.Albums
 {
-    [Route("api/[controller]/[action]")]
-    //[Authorize(Roles = "Admin")]
+    [Route("[controller]/[action]")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [UnitOfWork(typeof(ListeningDbContext))]
     public class AlbumController : ControllerBase

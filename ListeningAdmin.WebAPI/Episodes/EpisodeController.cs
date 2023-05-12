@@ -12,7 +12,7 @@ namespace ListeningAdmin.WebAPI.Episodes
 {
     [Route("[controller]/[action]")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [UnitOfWork(typeof(ListeningDbContext))]
     public class EpisodeController : ControllerBase
     {

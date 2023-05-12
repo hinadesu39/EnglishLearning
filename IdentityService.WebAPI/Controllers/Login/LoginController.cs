@@ -1,25 +1,33 @@
-﻿using IdentityServiceDomain;
+﻿using IdentityService.WebAPI.Controllers.Login.Request;
+using IdentityService.WebAPI.Events;
+using IdentityServiceDomain;
 using IdentityServiceDomain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Net;
 using System.Security.Claims;
 
 namespace IdentityService.WebAPI.Controllers.Login
 {
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class LoginController : ControllerBase
     {
         private readonly IIdRepository repository;
         private readonly IdDomainService idService;
+        private readonly IdUserManager userManager;
+        private IMediator mediator;
 
-        public LoginController(IdDomainService idService, IIdRepository repository)
+        public LoginController(IdDomainService idService, IIdRepository repository, IMediator mediator, IdUserManager userManager)
         {
             this.idService = idService;
             this.repository = repository;
+            this.mediator = mediator;
+            this.userManager = userManager;
         }
         [HttpPost]
         [AllowAnonymous]
@@ -30,15 +38,15 @@ namespace IdentityService.WebAPI.Controllers.Login
                 return StatusCode((int)HttpStatusCode.Conflict, "已经初始化过了");
             }
             User user = new User("admin");
-            var r = await repository.CreateAsync(user, "123456");
-            Debug.Assert(r.Succeeded);
+            await repository.CreateAsync(user, "123456");
+
             var token = await repository.GenerateChangePhoneNumberTokenAsync(user, "18918999999");
-            var cr = await repository.ChangePhoneNumAsync(user.Id, "18918999999", token);
-            Debug.Assert(cr.Succeeded);
-            r = await repository.AddToRoleAsync(user, "User");
-            Debug.Assert(r.Succeeded);
-            r = await repository.AddToRoleAsync(user, "Admin");
-            Debug.Assert(r.Succeeded);
+            await repository.ChangePhoneNumAsync(user.Id, "18918999999", token);
+
+            await repository.AddToRoleAsync(user, "User");
+
+            await repository.AddToRoleAsync(user, "Admin");
+
             return Ok();
         }
 
@@ -57,7 +65,7 @@ namespace IdentityService.WebAPI.Controllers.Login
             return new UserResponse(user.Id, user.PhoneNumber, user.CreationTime);
         }
 
-        //书中的项目只提供根据用户名登录的功能，以及管理员增删改查，像用户主动注册、手机验证码登录等功能都不弄。
+        
 
         [AllowAnonymous]
         [HttpPost]
@@ -112,5 +120,64 @@ namespace IdentityService.WebAPI.Controllers.Login
                 return BadRequest(resetPwdResult.Errors);
             }
         }
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult> CreateUserWithPhoneNumAndCode(CreateUserWithPhoneNumAndCodeRequest req)
+        {
+            string userName = req.userName;
+            string code = req.code;
+            string phoneNum = req.PhoneNum;
+            string passWord = req.passWord;
+            var result = await repository.CheakForCodeAsync(phoneNum, code);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+            (result, var user) =await repository.AddUserAsync(userName, phoneNum,passWord);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+            return Ok(user);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult> ChangeMyPasswordWithCode(ChangeMyPasswordWithCodeRequest req)
+        {   
+            string phoneNum = req.phoneNum;
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNum);
+            if(user == null)
+            {
+                return NotFound("未找到该用户");
+            }
+            string code = req.code;
+            var result = await repository.CheakForCodeAsync(phoneNum, code);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+            var resetPwdResult = await repository.ChangePasswordAsync(user.Id, req.Password);
+            if (resetPwdResult.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(resetPwdResult.Errors);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult> SendCodeByPhone(SendCodeByPhoneRequest req)
+        {
+            string phoneNum = req.PhoneNumber;
+            string code = await repository.BuildCodeAsync(phoneNum);
+            var sendCodeEvent = new SendCodeByPhoneEvent(phoneNum, code);
+            mediator.Publish(sendCodeEvent);
+            return Ok();
+        }
+
     }
 }

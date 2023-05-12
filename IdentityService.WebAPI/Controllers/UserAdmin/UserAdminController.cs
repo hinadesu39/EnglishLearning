@@ -1,14 +1,15 @@
-﻿using IdentityService.WebAPI.Event;
+﻿using IdentityService.WebAPI.Controllers.UserAdmin.Request;
+using IdentityService.WebAPI.Event;
 using IdentityServiceDomain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc; 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.WebAPI.Controllers.UserAdmin
 {
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class UserAdminController : ControllerBase

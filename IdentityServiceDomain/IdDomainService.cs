@@ -2,6 +2,7 @@
 using IdentityServiceDomain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace IdentityServiceDomain
         }
 
         /// <summary>
-        /// 根据给定用户的信息（包括其ID和角色）构建一个令牌。
+        /// 根据给定用户的信息（包括其ID和角色）构建一个JWT令牌。
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
@@ -39,6 +40,7 @@ namespace IdentityServiceDomain
             }
             return TokenService.BuildToken(claims, optJWT.Value);
         }
+
 
         public async Task<(SignInResult result, string? token)> LoginByPhoneAndPwdAsync(string phoneNum, string password)
         {

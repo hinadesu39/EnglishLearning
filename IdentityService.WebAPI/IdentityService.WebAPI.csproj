@@ -15,6 +15,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Zack.AnyDBConfigProvider" Version="1.1.4" />
+    <PackageReference Include="Zack.Commons" Version="1.1.11" />
   </ItemGroup>
 
   <ItemGroup>

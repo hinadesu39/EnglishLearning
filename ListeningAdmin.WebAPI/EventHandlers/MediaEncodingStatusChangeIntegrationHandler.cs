@@ -2,7 +2,6 @@
 using ListeningDomain;
 using ListeningDomain.Entities;
 using ListeningInfrastructure;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.SignalR;
 using Zack.EventBus;
 
@@ -15,7 +14,7 @@ namespace ListeningAdmin.WebAPI.EventHandlers
     [EventName("MediaEncoding.Failed")]
     [EventName("MediaEncoding.Duplicated")]
     [EventName("MediaEncoding.Completed")]
-    public class MediaEncodingStatusChangeIntegrationHandler : DynamicIntegrationEventHandler
+    class MediaEncodingStatusChangeIntegrationHandler : DynamicIntegrationEventHandler
     {
         private readonly ListeningDbContext dbContext;
         private readonly IListeningRepository repository;
@@ -34,7 +33,7 @@ namespace ListeningAdmin.WebAPI.EventHandlers
         public override async Task HandleDynamic(string eventName, dynamic eventData)
         {
 
-            string sourceSystem = eventData.sourceSystem;
+            string sourceSystem = eventData.SourceSystem;
             if(sourceSystem != "Listening")
             {
                 return;
@@ -65,6 +64,7 @@ namespace ListeningAdmin.WebAPI.EventHandlers
                     Episode episode = Episode.Create(id, maxSeq + 1, encItem.Name, albumId, OutPutUrl,
                     encItem.DurationInSecond, encItem.SubtitleType, encItem.Subtitle);
                     //真正存到数据库当中
+                    dbContext.Add(episode);
                     await dbContext.SaveChangesAsync();
                     break;
                 default:

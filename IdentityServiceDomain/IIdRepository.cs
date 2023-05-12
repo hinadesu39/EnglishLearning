@@ -11,8 +11,21 @@ namespace IdentityServiceDomain
         Task<IdentityResult> CreateAsync(User user, string password);//创建用户
         Task<IdentityResult> AccessFailedAsync(User user);//记录一次登陆失败
 
+
         /// <summary>
-        /// 生成重置密码的令牌
+        /// 验证验证码是否正确
+        /// </summary>
+        /// <param name="phoneNum"></param>
+        /// <returns></returns>
+        Task<IdentityResult> CheakForCodeAsync(string phoneNum, string code);
+        /// <summary>
+        /// 为新注册的用户的指定的手机号发验证码
+        /// </summary>
+        /// <param name="phoneNum"></param>
+        /// <returns></returns>
+        Task<string> BuildCodeAsync(string phoneNum);
+        /// <summary>
+        /// 为已创建的用户生成重置密码的令牌
         /// </summary>
         /// <param name="user"></param>
         /// <param name="phoneNumber"></param>
@@ -84,7 +97,16 @@ namespace IdentityServiceDomain
         /// <param name="phoneNum"></param>
         /// <returns>返回值第三个是生成的密码</returns>
         public Task<(IdentityResult, User?, string? password)> AddAdminUserAsync(string userName, string phoneNum);
-
+        
+        
+        /// <summary>
+        /// 添加普通用户
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="phoneNumber"></param>
+        /// <param name="passWord"></param>
+        /// <returns></returns>
+        public Task<(IdentityResult, User?)> AddUserAsync(string userName, string phoneNumber,string? passWord);
         /// <summary>
         /// 重置密码。
         /// </summary>

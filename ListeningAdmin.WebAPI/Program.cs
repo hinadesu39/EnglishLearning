@@ -23,6 +23,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSignalR();
+
 builder.Services.Configure<MvcOptions>(o =>
 {
     //注册全局的filter
@@ -57,7 +59,6 @@ builder.Services.AddLogging(builder =>
 });
 Log.Logger.Information("hello");
 
-builder.Services.AddSignalR().AddStackExchangeRedis("127.0.0.1", opt => opt.Configuration.ChannelPrefix = "SignalR");
 
 //开始配置跨域
 builder.Services.AddCors(options =>
@@ -119,13 +120,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
+app.UseEventBus();
 app.MapHub<EpisodeEncodingStatusHub>("/Hubs/EpisodeEncodingStatusHub");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseForwardedHeaders();
 app.MapControllers();
 app.UseCors();
-app.UseEventBus();
 app.Run();

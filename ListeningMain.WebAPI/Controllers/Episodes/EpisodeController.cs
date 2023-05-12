@@ -5,7 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace ListeningMain.WebAPI.Controllers.Episodes
 {
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class EpisodeController : ControllerBase
     {

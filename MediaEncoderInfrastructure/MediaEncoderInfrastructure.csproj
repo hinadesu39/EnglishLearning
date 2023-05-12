@@ -8,6 +8,7 @@
 
   <ItemGroup>
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.16" />
+	  <PackageReference Include="xFFmpeg.NET" Version="7.1.3" />
   </ItemGroup>
 
   <ItemGroup>

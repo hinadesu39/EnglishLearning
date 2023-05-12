@@ -3,7 +3,9 @@ using IdentityServiceDomain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,21 +17,44 @@ namespace IdentityServiceInfrastructure
 {
     public class IdRepository : IIdRepository
     {
+        private readonly IConnectionMultiplexer redisConn;
         private readonly IdUserManager userManager;
-        private readonly RoleManager<Role> roleManager;
+        private readonly RoleManager<IdentityServiceDomain.Entities.Role> roleManager;
         private readonly ILogger<IdRepository> logger;
 
-        public IdRepository(IdUserManager userManager, RoleManager<Role> roleManager, ILogger<IdRepository> logger)
+        public IdRepository(IdUserManager userManager, RoleManager<IdentityServiceDomain.Entities.Role> roleManager, ILogger<IdRepository> logger, IConnectionMultiplexer redisConn)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.logger = logger;
+            this.redisConn = redisConn;
         }
 
         private static IdentityResult ErrorResult(string msg)
         {
             IdentityError idError = new IdentityError { Description = msg };
             return IdentityResult.Failed(idError);
+        }
+
+
+        public async Task<IdentityResult> CheakForCodeAsync(string phoneNum,string code)
+        {
+            var db = redisConn.GetDatabase();
+            var value = db.StringGet(phoneNum).ToString();
+            if(value != code || value == null)
+            {
+                return ErrorResult("验证码错误，请重新发送");
+            }
+            return IdentityResult.Success;
+        }
+
+        public async Task<string> BuildCodeAsync(string phoneNum)
+        {
+            Random random = new Random();
+            string code = random.Next(100000, 999999).ToString();
+            var db = redisConn.GetDatabase();
+            await db.StringSetAsync(phoneNum, code, TimeSpan.FromMinutes(5));
+            return code;
         }
 
         private string GeneratePassword()
@@ -72,6 +97,8 @@ namespace IdentityServiceInfrastructure
             return userManager.AccessFailedAsync(user);
         }
 
+
+
         public async Task<(IdentityResult, User?, string? password)> AddAdminUserAsync(string userName, string phoneNum)
         {
             if(await FindByNameAsync(userName) != null)
@@ -99,11 +126,36 @@ namespace IdentityServiceInfrastructure
             return (IdentityResult.Success, user, password);
         }
 
+        public async Task<(IdentityResult, User?)> AddUserAsync(string userName, string phoneNumber,string? passWord)
+        {
+            if (await FindByNameAsync(userName) != null)
+            {
+                return (ErrorResult($"该用户名已经存在{userName}"), null);
+            }
+            if (await FindByPhoneNumberAsync(phoneNumber) != null)
+            {
+                return (ErrorResult($"该手机号已经存在{phoneNumber}"), null);
+            }
+            User user = new User(userName);
+            user.PhoneNumber = phoneNumber;
+            user.PhoneNumberConfirmed = true;
+            var result = await CreateAsync(user, passWord);
+            if (!result.Succeeded)
+            {
+                return (result, null);
+            }
+            result = await AddToRoleAsync(user, "User");
+            if (!result.Succeeded)
+            {
+                return (result, null);
+            }
+            return (IdentityResult.Success, user);
+        }
         public async Task<IdentityResult> AddToRoleAsync(User user, string roleName)
         {
             if (!await roleManager.RoleExistsAsync(roleName))
             {
-                Role role = new Role { Name = roleName };
+                IdentityServiceDomain.Entities.Role role = new IdentityServiceDomain.Entities.Role { Name = roleName };
                 var result = await roleManager.CreateAsync(role);
                 if (!result.Succeeded)
                 {
@@ -257,7 +309,6 @@ namespace IdentityServiceInfrastructure
             user.PhoneNumber = phoneNum;
             await userManager.UpdateAsync(user);
         }
-
 
     }
 }
