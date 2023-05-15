@@ -25,7 +25,7 @@ namespace ListeningAdmin.WebAPI
                 return;
             }
 
-            //MethodInfo是ControllerActionDescriptor独有的，所有需要显式转换
+            //MethodInfo是ControllerActionDescriptor独有的，所以需要显式转换
             var actionDesc = context.ActionDescriptor as ControllerActionDescriptor;
             if (actionDesc == null)
             {
@@ -63,6 +63,5 @@ namespace ListeningAdmin.WebAPI
                 }
             }
         }
-
     }
 }

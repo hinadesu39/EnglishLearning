@@ -74,7 +74,7 @@ namespace ListeningAdmin.WebAPI.Albums
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPut]
         [Route("{id}")]
         public async Task<ActionResult> Hide(Guid id)
         {
@@ -86,7 +86,7 @@ namespace ListeningAdmin.WebAPI.Albums
             album.Hide();
             return Ok();
         }
-        [HttpGet]
+        [HttpPut]
         [Route("{id}")]
         public async Task<ActionResult> Show(Guid id)
         {

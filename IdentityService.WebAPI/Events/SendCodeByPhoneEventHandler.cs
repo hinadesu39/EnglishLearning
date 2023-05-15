@@ -17,7 +17,7 @@ namespace IdentityService.WebAPI.Events
         public Task Handle(SendCodeByPhoneEvent notification, CancellationToken cancellationToken)
         {
 
-            //发送密码给被创建用户的手机
+            //发送验证码给被创建用户的手机
             return smsSender.SendAsync(notification.PhoneNum, notification.token);
         }
     }

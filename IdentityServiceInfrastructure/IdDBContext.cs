@@ -20,7 +20,6 @@ namespace IdentityServiceInfrastructure
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
-            //modelBuilder.EnableSoftDeletionGlobalFilter();
             modelBuilder.Entity<User>().HasQueryFilter(p => !p.IsDeleted);
 
         }

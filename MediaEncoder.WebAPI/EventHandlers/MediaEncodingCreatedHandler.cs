@@ -1,5 +1,7 @@
-﻿using MediaEncoderDomain.Entities;
+﻿using CommonHelper;
+using MediaEncoderDomain.Entities;
 using MediaEncoderInfrastructure;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Zack.EventBus;
 
@@ -10,11 +12,13 @@ namespace MediaEncoder.WebAPI.EventHandlers
     {
         private readonly IEventBus eventBus;
         private readonly MEDbContext dbContext;
+        private readonly Mediator mediator;
 
-        public MediaEncodingCreatedHandler(IEventBus eventBus, MEDbContext dbContext)
+        public MediaEncodingCreatedHandler(IEventBus eventBus, MEDbContext dbContext, Mediator mediator)
         {
             this.eventBus = eventBus;
             this.dbContext = dbContext;
+            this.mediator = mediator;
         }
 
         public override async Task HandleDynamic(string eventName, dynamic eventData)
@@ -37,6 +41,7 @@ namespace MediaEncoder.WebAPI.EventHandlers
             }
             var encodeItem = EncodingItem.Create(mediaId, fileName, mediaUrl, outputFormat, sourceSystem);
             dbContext.Add(encodeItem);
+            await MediatorHelper.DispatchDomainEventsAsync(mediator, dbContext);
             await dbContext.SaveChangesAsync();
         }
     }

@@ -4,6 +4,8 @@ using FileService.WebAPI.Uploader;
 using FileServiceDomain;
 using FileServiceInfrastrucure;
 using FileServiceInfrastrucure.Services;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,9 @@ using Zack.Commons;
 
 namespace FileService.SDK.NETCore
 {
+    /// <summary>
+    /// 供转码服务使用，提供文件上传功能
+    /// </summary>
     public class FileServiceClient
     {
         private readonly IHttpClientFactory httpClientFactory;
@@ -67,27 +72,32 @@ namespace FileService.SDK.NETCore
                 return respString.ParseJson<Uri>()!;
             }
         }
-
-        public async Task<Uri> UploadAsync(FileInfo file, CancellationToken stoppingToken = default)
-        {
-            string fileName = file.Name;
-            DateTime today = DateTime.Today;
-            string key = $"Completed/{today.Year}/{today.Month}/{today.Day}/{fileName}";
-            string workingDir = smbOption.Value.WorkingDir;
-            //给文件安排一个位置
-            string fullPath = Path.Combine(workingDir, key);
-            string? fullDir = Path.GetDirectoryName(fullPath);
-            if (!Directory.Exists(fullDir))
-            {
-                Directory.CreateDirectory(fullDir);
-            }
-            if (File.Exists(fullPath))
-            {
-                File.Delete(fullPath);
-            }
-            //写入
-            file.CopyTo(fullPath);
-            return new Uri(fullPath);
-        }
+        /// <summary>
+        /// 不推荐，万不得已才把文件服务器和代码运行的服务器放在一起，而且http不支持直接读取本地文件
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="stoppingToken"></param>
+        /// <returns></returns>
+        //public async Task<Uri> UploadAsync(FileInfo file, CancellationToken stoppingToken = default)
+        //{
+        //    string fileName = file.Name;
+        //    DateTime today = DateTime.Today;
+        //    string key = $"Completed/{today.Year}/{today.Month}/{today.Day}/{fileName}";
+        //    string workingDir = smbOption.Value.WorkingDir;
+        //    //给文件安排一个位置
+        //    string fullPath = Path.Combine(workingDir, key);
+        //    string? fullDir = Path.GetDirectoryName(fullPath);
+        //    if (!Directory.Exists(fullDir))
+        //    {
+        //        Directory.CreateDirectory(fullDir);
+        //    }
+        //    if (File.Exists(fullPath))
+        //    {
+        //        File.Delete(fullPath);
+        //    }
+        //    //写入
+        //    file.CopyTo(fullPath);
+        //    return new Uri(fullPath);
+        //}
     }
 }

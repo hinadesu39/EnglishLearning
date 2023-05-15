@@ -10,7 +10,7 @@ namespace IdentityServiceDomain
         Task<User?> FindByPhoneNumberAsync(string phoneNum);//根据手机号获取用户
         Task<IdentityResult> CreateAsync(User user, string password);//创建用户
         Task<IdentityResult> AccessFailedAsync(User user);//记录一次登陆失败
-
+        Task<IdentityResult> ResetAccessFailedCountAsync(User user);//重制登录失败次数
 
         /// <summary>
         /// 验证验证码是否正确

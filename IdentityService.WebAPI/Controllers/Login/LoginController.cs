@@ -29,6 +29,10 @@ namespace IdentityService.WebAPI.Controllers.Login
             this.mediator = mediator;
             this.userManager = userManager;
         }
+        /// <summary>
+        /// 仅供测试
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
         public async Task<ActionResult> CreateWorld()

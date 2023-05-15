@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileServiceInfrastrucure.Services
+namespace CommonHelper
 {
-    internal class MockCloudStorage
+    public class ElasticSearchOptions
     {
+        public Uri Url { get; set; }
     }
 }

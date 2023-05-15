@@ -97,6 +97,11 @@ namespace IdentityServiceInfrastructure
             return userManager.AccessFailedAsync(user);
         }
 
+        public Task<IdentityResult> ResetAccessFailedCountAsync(User user)
+        {
+            return userManager.ResetAccessFailedCountAsync(user);
+        }
+
 
 
         public async Task<(IdentityResult, User?, string? password)> AddAdminUserAsync(string userName, string phoneNum)
@@ -206,6 +211,7 @@ namespace IdentityServiceInfrastructure
             var result = await userManager.CheckPasswordAsync(user, password);
             if (result)
             {
+                await ResetAccessFailedCountAsync(user);
                 return SignInResult.Success;
             }
             else

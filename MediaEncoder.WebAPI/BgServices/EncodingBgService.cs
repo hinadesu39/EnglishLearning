@@ -94,8 +94,8 @@ namespace MediaEncoder.WebAPI.BgServices
             Uri urlRoot = optionFileService.Value.UrlRoot;
             FileServiceClient fileService = new FileServiceClient(httpClientFactory,
                     urlRoot, optionJWT.Value, smbOption);
-            return fileService.UploadAsync(file, ct);
-            //return fileService.UploadCloudAsync(file,ct);
+            //return fileService.UploadAsync(file, ct);
+            return fileService.UploadCloudAsync(file,ct);
         }
 
 
@@ -170,6 +170,7 @@ namespace MediaEncoder.WebAPI.BgServices
                 return;//再去抢下一个
             }
             encItem.Start();
+            await MediatorHelper.DispatchDomainEventsAsync(mediator,dbContext);
             await dbContext.SaveChangesAsync(ct);//立即保存一下状态的修改
                                                  //发出一次集成事件
             (var downloadOk, var srcFile) = await DownloadSrcAsync(encItem, ct);
@@ -208,22 +209,6 @@ namespace MediaEncoder.WebAPI.BgServices
                 encItem.Complete(destUrl);
                 encItem.ChangeFileMeta(fileSize, srcFileHash);
                 logger.LogInterpolatedInformation($"Id={id}转码结果上传成功");
-                //发出集成事件和领域事件
-                var domainEntities = dbContext.ChangeTracker
-                .Entries<IDomainEvents>()
-                .Where(x => x.Entity.GetDomainEvents().Any());
-
-                var domainEvents = domainEntities
-                    .SelectMany(x => x.Entity.GetDomainEvents())
-                    .ToList();//加ToList()是为立即加载，否则会延迟执行，到foreach的时候已经被ClearDomainEvents()了
-
-                domainEntities.ToList()
-                    .ForEach(entity => entity.Entity.ClearDomainEvents());
-                foreach (var domainEvent in domainEvents)
-                {
-                    await mediator.Publish(domainEvent);
-                }
-
             }
             finally
             {
@@ -251,6 +236,7 @@ namespace MediaEncoder.WebAPI.BgServices
                     {
                         readyItem.Fail(ex);
                     }
+                    await MediatorHelper.DispatchDomainEventsAsync(mediator, dbContext);
                     await this.dbContext.SaveChangesAsync(ct);
                 }
                 await Task.Delay(5000);//暂停5s，避免没有任务的时候CPU空转

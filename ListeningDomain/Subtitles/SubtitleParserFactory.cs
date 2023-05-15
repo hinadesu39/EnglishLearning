@@ -13,8 +13,9 @@ namespace ListeningDomain.Subtitles
         static SubtitleParserFactory()
         {
             //扫描本程序集中的所有实现了ISubtitleParser接口的类
-            var parserTypes = typeof(SubtitleParserFactory).Assembly.GetTypes().Where(t => typeof(ISubtitleParser).IsAssignableFrom(t) && !t.IsAbstract);
-
+            var parserTypes = typeof(SubtitleParserFactory).Assembly.GetTypes()
+                .Where(t => typeof(ISubtitleParser).IsAssignableFrom(t) && !t.IsAbstract);
+            
             //创建这些对象，添加到parsers
             foreach (var parserType in parserTypes)
             {

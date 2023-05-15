@@ -99,6 +99,10 @@ builder.Services.AddDataProtection();
 //https://github.com/aspnet/Identity/issues/1376
 IdentityBuilder idBuilder = builder.Services.AddIdentityCore<User>(options =>
 {
+    //三次登录失败锁定用户5分钟
+    options.Lockout.MaxFailedAccessAttempts = 3;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireNonAlphanumeric = false;
@@ -107,6 +111,7 @@ IdentityBuilder idBuilder = builder.Services.AddIdentityCore<User>(options =>
     //不能设定RequireUniqueEmail，否则不允许邮箱为空
     //options.User.RequireUniqueEmail = true;
     //以下两行，把GenerateEmailConfirmationTokenAsync验证码缩短
+
     options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
     options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
 }
