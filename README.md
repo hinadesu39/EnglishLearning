@@ -1,3 +1,3 @@
-# EnglishLearning
-ASP.net webapi
-this is my learning project
+## EnglishLearning
+---
+A DDD project in ASP.NET Core WebApi
